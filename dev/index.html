@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style> 
+      body { 
+        padding: 0; 
+        margin: 0; 
+        font-family: 'Ubuntu Mono', 'Inconsolata', monospace; 
+        color: #333;
+        background-color: #eee;
+      } 
+      #recording { position: fixed; bottom: 1rem; left: 1rem; }
+
+      #correlation { 
+        position: absolute; 
+        top: 1rem; 
+        left: 1rem; 
+        list-style-type: none; 
+        margin: 0;
+        padding: 0;
+      }
+
+      #correlation tr {
+        line-height: 2rem;
+      }
+      #correlation td      { width: 8rem; } 
+      #correlation td + td { width: 8rem; }
+      #correlation td + td + td { width: 4rem; }
+
+      #correlation tbody tr td {
+        position: relative;
+      }
+
+      #correlation tbody tr td input.name {
+        border: inherit;
+        background: inherit;
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        color: inherit;
+        line-height: 2rem;
+        margin: 0;
+        padding: 0;
+        outline: 0;
+      }
+      #correlation tbody tr td input.name:focus {
+        background-color: #ddd;
+      }
+
+      #correlation tbody tr td.correlation span {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 5;
+        text-align: center;
+      }
+
+      #correlation tbody tr td.correlation div {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #0f0;
+        box-shadow: inset 0px 0px 6px rgba(128, 255, 128, 0.8);
+        border-radius: 3px;
+        width: 0;
+
+        z-index: 4;
+      }
+
+      #correlation tbody tr a.record {
+        background: red;
+        box-shadow: inset 0px 0px 10px rgba(128, 0, 0, .6);
+        border-radius: 9999px;
+        color: white;
+        display: block;
+        float: left;
+        font-size: .7rem;
+        font-weight: bold;
+        line-height: 2rem;
+        height: 2rem;
+        width: 2rem;
+
+        text-align: center;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+      #correlation tbody tr a.record:before { content: 'REC' }
+      #correlation tbody tr a.record[data-recording=true] { 
+        box-shadow: inset 0px 0px 10px rgba(64, 64, 64, .8);
+        background: white; color: red;
+      }
+
+      #correlation tr.add td {
+        text-align: left;
+        padding-top: 1rem;
+      }
+
+      #correlation tr.add td a {
+        background: #333;
+        color: #eee;
+        border-radius: 3px;
+        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+        text-decoration: none;
+        padding: .5rem;
+      }
+
+
+
+      #results {
+        float: right;
+        padding: 1rem;
+      }
+
+      #results tr {
+        line-height: 2rem;
+      }
+      #results td      { width: 8rem; } 
+      #results td + td { width: 8rem; }
+      #results td + td + td { width: 4rem; }
+
+      #results tbody tr td {
+        position: relative;
+      }
+
+      #results tr.add td {
+        text-align: left;
+        padding-top: 1rem;
+      }
+
+      #results tr.add td a {
+        background: #333;
+        color: #eee;
+        border-radius: 3px;
+        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+        text-decoration: none;
+        padding: .5rem;
+      }
+
+      #gesture-log p {
+
+        position: absolute;
+        bottom: 0;
+        font-size: 1rem;
+        font-weight: bold;
+
+        font-family: monospace;
+      }
+      #reset-log {
+        background: #333;
+        color: #eee;
+        border-radius: 3px;
+        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+        text-decoration: none;
+        padding: .5rem;
+        display: inline-block;
+        position: fixed;
+        width: auto;
+        bottom: 1rem;
+        right: 1rem;
+        z-index: 999999;
+      }
+
+      canvas { z-index: -1; }
+    </style>
+  </head>
+  <body>
+    <div id='recording'></div>
+    <table id='correlation'>
+      <thead>
+        <tr>
+          <td>Gesture</td>
+          <td>Correlation</td>
+          <td>Samples</td>
+          <td>&nbsp;</td>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+      <tfoot>
+        <tr class='add'><td colspan='2'><a id='addGesture' href='#'>Add new gesture</a></td><td colspan='2'><input id='thresh' type='text' placeholder='Threshold'/></td></tr>
+      </tfoot>
+    </table>
+
+
+    <table id='results'>
+      <thead>
+        <tr>
+          <td>Gesture</td>
+          <td>Correlation</td>
+          <td>Certainty</td>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+      <tfoot>
+        <tr class='add'>
+          <td colspan='2'><a id='getResults' href='#'>Test</a></td>
+          <td colspan='2'><a id='reset' href='#'>Reset</a></td>
+        </tr>
+      </tfoot>
+
+    </table>
+
+
+    <div id='gesture-log'>
+      <a href="#" id='reset-log'>Reset</a><p></p>
+    </div>
+
+
+    <script type='text/javascript' src='vendor/requirejs/require.js' data-main='js/config'></script>
+    <script type='text/x-tmpl-mustache' id='__template_gesture'>
+      <td><input class='name' type='text' value='{{name}}'/></td>
+      <td class='correlation'><span></span><div></div></td>
+      <td class='samples'></td>
+      <td><a class='record' href="#"></a></td>
+    </script>
+
+  </body>
+</html>

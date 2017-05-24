@@ -1,0 +1,30 @@
+{
+  "name": "LeapMotionANN",
+  "version": "0.0.0",
+  "authors": [
+    "Andrea Venuta",
+    "Giovanni Pinto"
+  ],
+  "moduleType": [
+    "amd"
+  ],
+  "license": "All Rights Reserved",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "leapjs-plugins": "~0.1.6",
+    "requirejs": "~2.1.14",
+    "leapjs": "~0.6.1",
+    "threejs": "*",
+    "watch": "*",
+    "requirejs-text": "~2.0.12",
+    "mustache": "~0.8.2"
+  }
+}
